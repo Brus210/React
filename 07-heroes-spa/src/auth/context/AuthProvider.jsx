@@ -7,24 +7,45 @@ const initialState = {
     logged: false,
 }
 
+const init = () => {
+    const user = JSON.parse(localStorage.getItem('user')) ;
+
+    return    {
+        logged: !!user,
+        user: user,
+    }
+}
+
+
 
 export const AuthProvider = ({children}) => {
 
-    const [authState, dispatch] = useReducer(authReducer, initialState);
+    const [authState, dispatch] = useReducer(authReducer, initialState, init);
 
     const login = async (name ='') => {
+
+        const user = {id: 'ABC', name};
         const action ={
-            types: types.login,
-            payload: {
-                id: '123',
-                name}
+            type: types.login,
+            payload: user,
+        }
+
+        localStorage.setItem('user', JSON.stringify(user));
+        dispatch(action);
+    }
+
+    const logOut = () => {
+
+        localStorage.removeItem('user');
+        const action ={
+            type: types.logout,            
         }
 
         dispatch(action);
     }
 
   return (
-    <AuthContext.Provider value={{...authState, login}}>
+    <AuthContext.Provider value={{...authState, login, logOut}}>
         {children}
     </AuthContext.Provider>
   )
